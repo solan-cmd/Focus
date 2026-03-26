@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Focus & Discipline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070709;
+    --bg2: #0e0e16;
+    --bg3: #14141f;
+    --card: #18182a;
+    --card2: #1e1e30;
+    --violet: #7c3aed;
+    --violet2: #9d5cf0;
+    --violet3: #b47ff5;
+    --orange: #ff6b00;
+    --orange2: #ff8c33;
+    --neon: #ff6b00;
+    --text: #f0f0ff;
+    --muted: #6b6b8a;
+    --border: #2a2a40;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --gold: #f59e0b;
+    --premium: #f59e0b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== APP SHELL ===== */
+  #app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  /* ===== PAGES ===== */
+  .page { display: none; flex-direction: column; min-height: 100vh; padding-bottom: 80px; animation: fadeIn 0.3s ease; }
+  .page.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    padding: 52px 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, var(--bg) 60%, transparent);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .topbar h1 span { color: var(--orange); }
+  .premium-badge {
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .avatar-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet), var(--orange));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px; cursor: pointer;
+    border: none; color: white;
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: rgba(14,14,22,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex; z-index: 100;
+    padding: 8px 0 20px;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; padding: 6px 0;
+    transition: all 0.2s;
+    border: none; background: none; color: var(--muted);
+    font-family: 'Syne', sans-serif; font-size: 10px;
+  }
+  .nav-item svg { width: 22px; height: 22px; transition: all 0.2s; }
+  .nav-item.active { color: var(--orange); }
+  .nav-item.active svg { filter: drop-shadow(0 0 6px var(--orange)); }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 0 16px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-glow { box-shadow: 0 0 30px rgba(124,58,237,0.15); }
+  .card-orange { box-shadow: 0 0 30px rgba(255,107,0,0.12); }
+
+  /* ===== STREAK CARD ===== */
+  .streak-card {
+    background: linear-gradient(135deg, #1a0a2e 0%, #2a0a1e 50%, #1a0a0a 100%);
+    border: 1px solid rgba(124,58,237,0.4);
+    border-radius: 24px;
+    padding: 24px;
+    margin: 0 16px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .streak-card::before {
+    content: '';
+    position: absolute; top: -50%; right: -20%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,107,0,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .streak-number {
+    font-size: 72px; font-weight: 800; line-height: 1;
+    background: linear-gradient(135deg, var(--orange), var(--violet2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .streak-label { font-size: 13px; color: var(--muted); margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+  .streak-row { display: flex; gap: 6px; margin-top: 16px; }
+  .streak-dot {
+    flex: 1; height: 6px; border-radius: 3px;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+  .streak-dot.done { background: linear-gradient(90deg, var(--orange), var(--violet)); }
+  .streak-dot.today { background: var(--orange); box-shadow: 0 0 8px var(--orange); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+  /* ===== SECTION TITLE ===== */
+  .section-title {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 2px; color: var(--muted);
+    padding: 8px 16px 12px;
+  }
+
+  /* ===== OBJECTIVE CARDS ===== */
+  .obj-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 0 16px 10px;
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer; transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .obj-card:active { transform: scale(0.98); }
+  .obj-card::after {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; border-radius: 3px 0 0 3px;
+  }
+  .obj-card.sport::after { background: var(--orange); }
+  .obj-card.study::after { background: var(--violet); }
+  .obj-card.habit::after { background: var(--success); }
+  .obj-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .obj-icon.sport { background: rgba(255,107,0,0.15); }
+  .obj-icon.study { background: rgba(124,58,237,0.15); }
+  .obj-icon.habit { background: rgba(34,197,94,0.15); }
+  .obj-info { flex: 1; min-width: 0; }
+  .obj-title { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .obj-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .obj-progress { margin-top: 8px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .obj-bar { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+  .sport .obj-bar { background: linear-gradient(90deg, var(--orange), var(--orange2)); }
+  .study .obj-bar { background: linear-gradient(90deg, var(--violet), var(--violet2)); }
+  .habit .obj-bar { background: linear-gradient(90deg, var(--success), #4ade80); }
+  .obj-check {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.3s; cursor: pointer;
+    font-size: 14px; color: transparent;
+  }
+  .obj-check.done { background: var(--success); border-color: var(--success); color: white; }
+
+  /* ===== QUICK STATS ===== */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 16px; }
+  .stat-mini {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 16px; text-align: center;
+  }
+  .stat-mini-val { font-size: 28px; font-weight: 800; }
+  .stat-mini-val.orange { color: var(--orange); }
+  .stat-mini-val.violet { color: var(--violet2); }
+  .stat-mini-val.gold { color: var(--gold); }
+  .stat-mini-val.green { color: var(--success); }
+  .stat-mini-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ===== POMODORO ===== */
+  .pomo-wrap { display: flex; flex-direction: column; align-items: center; padding: 20px 16px; }
+  .pomo-ring {
+    position: relative; width: 240px; height: 240px; margin: 20px 0;
+  }
+  .pomo-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .pomo-ring circle.bg { fill: none; stroke: var(--border); stroke-width: 8; }
+  .pomo-ring circle.prog {
+    fill: none; stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 691;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.5s;
+  }
+  .pomo-ring circle.prog.work { stroke: var(--orange); filter: drop-shadow(0 0 8px var(--orange)); }
+  .pomo-ring circle.prog.rest { stroke: var(--violet); filter: drop-shadow(0 0 8px var(--violet)); }
+  .pomo-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    text-align: center;
+  }
+  .pomo-time { font-family: 'Space Mono', monospace; font-size: 52px; font-weight: 700; letter-spacing: -2px; }
+  .pomo-type { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-top: 4px; }
+  .pomo-controls { display: flex; gap: 16px; margin-top: 8px; }
+  .btn-pomo {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: none; cursor: pointer; font-size: 24px;
+    transition: all 0.2s;
+  }
+  .btn-pomo:active { transform: scale(0.95); }
+  .btn-pomo.primary {
+    background: linear-gradient(135deg, var(--orange), #cc5500);
+    box-shadow: 0 0 20px rgba(255,107,0,0.4);
+    color: white;
+  }
+  .btn-pomo.secondary { background: var(--card2); color: var(--muted); border: 1px solid var(--border); }
+  .pomo-sessions { display: flex; gap: 8px; margin-top: 20px; }
+  .session-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: all 0.3s; }
+  .session-dot.done { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+  .pomo-modes { display: flex; background: var(--card); border-radius: 12px; padding: 4px; margin-bottom: 8px; border: 1px solid var(--border); }
+  .pomo-mode-btn {
+    flex: 1; padding: 8px; border-radius: 8px; border: none;
+    background: transparent; color: var(--muted); font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .pomo-mode-btn.active { background: var(--card2); color: var(--text); }
+  .pomo-task-select {
+    width: 100%; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text); font-family: 'Syne', sans-serif;
+    font-size: 14px; padding: 12px 16px; margin-top: 8px;
+    -webkit-appearance: none;
+  }
+
+  /* ===== PLANNING ===== */
+  .week-scroll { display: flex; gap: 8px; padding: 0 16px 16px; overflow-x: auto; scrollbar-width: none; }
+  .week-scroll::-webkit-scrollbar { display: none; }
+  .day-pill {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 12px 14px; border-radius: 16px; min-width: 52px;
+    cursor: pointer; transition: all 0.2s;
+    background: var(--card); border: 1px solid var(--border);
+  }
+  .day-pill.today { background: linear-gradient(135deg, var(--orange), #cc4400); border-color: var(--orange); }
+  .day-pill.has-tasks { border-color: rgba(124,58,237,0.4); }
+  .day-abbr { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .day-pill.today .day-abbr { color: rgba(255,255,255,0.7); }
+  .day-num { font-size: 18px; font-weight: 800; margin-top: 4px; }
+  .day-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--violet2); margin-top: 6px; }
+
+  .task-item {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px 16px; margin: 0 16px 8px;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .task-item:active { transform: scale(0.98); }
+  .task-time { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--orange); min-width: 42px; }
+  .task-name { font-size: 14px; font-weight: 600; flex: 1; }
+  .task-cat { font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .task-cat.sport { background: rgba(255,107,0,0.2); color: var(--orange); }
+  .task-cat.study { background: rgba(124,58,237,0.2); color: var(--violet3); }
+  .task-cat.habit { background: rgba(34,197,94,0.2); color: var(--success); }
+  .task-done { text-decoration: line-through; color: var(--muted); }
+
+  /* ===== STATS ===== */
+  .chart-wrap {
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+    padding: 20px; margin: 0 16px 16px;
+  }
+  .chart-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .bar { width: 100%; border-radius: 6px 6px 0 0; min-height: 4px; transition: height 0.5s ease; position: relative; overflow: hidden; }
+  .bar::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 50%); }
+  .bar.orange { background: linear-gradient(180deg, var(--orange), rgba(255,107,0,0.4)); }
+  .bar.violet { background: linear-gradient(180deg, var(--violet2), rgba(124,58,237,0.4)); }
+  .bar.mixed { background: linear-gradient(180deg, var(--orange), var(--violet)); }
+  .bar-label { font-size: 10px; color: var(--muted); }
+
+  .progress-ring-wrap { display: flex; gap: 16px; margin: 0 16px 16px; }
+  .prog-ring-card {
+    flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 16px; display: flex; flex-direction: column; align-items: center;
+  }
+  .prog-ring-card svg { width: 80px; height: 80px; }
+  .prog-ring-card circle.bg2 { fill: none; stroke: var(--border); stroke-width: 6; }
+  .prog-ring-card circle.fg { fill: none; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 220; transition: stroke-dashoffset 1s ease; }
+  .prog-ring-label { font-size: 11px; color: var(--muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+  .prog-ring-val { font-size: 20px; font-weight: 800; margin-top: 4px; }
+
+  /* ===== BADGES ===== */
+  .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 16px 16px; }
+  .badge-item {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 12px 8px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .badge-item.unlocked { border-color: rgba(245,158,11,0.5); box-shadow: 0 0 15px rgba(245,158,11,0.1); }
+  .badge-item.locked { opacity: 0.4; filter: grayscale(1); }
+  .badge-emoji { font-size: 28px; }
+  .badge-name { font-size: 9px; text-align: center; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+
+  /* ===== PREMIUM MODAL ===== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+    align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    width: 100%; max-width: 430px;
+    background: linear-gradient(180deg, #1a0a2e 0%, var(--bg) 100%);
+    border-radius: 24px 24px 0 0;
+    padding: 28px 24px 40px;
+    animation: slideUp 0.3s ease;
+    border-top: 1px solid rgba(124,58,237,0.3);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 24px; }
+  .modal-title { font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+  .modal-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 24px; }
+  .premium-features { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+  .prem-feat { display: flex; align-items: center; gap: 12px; padding: 14px; background: rgba(124,58,237,0.1); border-radius: 12px; border: 1px solid rgba(124,58,237,0.2); }
+  .prem-feat-icon { font-size: 22px; }
+  .prem-feat-text { flex: 1; }
+  .prem-feat-title { font-size: 14px; font-weight: 700; }
+  .prem-feat-desc { font-size: 12px; color: var(--muted); }
+  .prem-price-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  .price-card {
+    flex: 1; padding: 16px; border-radius: 14px; border: 2px solid var(--border);
+    text-align: center; cursor: pointer; transition: all 0.2s;
+  }
+  .price-card.selected { border-color: var(--gold); background: rgba(245,158,11,0.1); }
+  .price-period { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .price-amount { font-size: 24px; font-weight: 800; margin: 4px 0; }
+  .price-save { font-size: 10px; background: var(--gold); color: var(--bg); padding: 2px 8px; border-radius: 20px; font-weight: 700; display: inline-block; }
+  .btn-premium {
+    width: 100%; padding: 18px; border-radius: 16px; border: none;
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    color: white; font-family: 'Syne', sans-serif;
+    font-size: 16px; font-weight: 800; cursor: pointer;
+    box-shadow: 0 0 30px rgba(245,158,11,0.3);
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn-premium:active { transform: scale(0.98); }
+
+  /* ===== ADD MODAL ===== */
+  .add-modal { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); align-items: flex-end; }
+  .add-modal.open { display: flex; }
+  .add-sheet { width: 100%; max-width: 430px; margin: 0 auto; background: var(--bg2); border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; animation: slideUp 0.3s ease; border-top: 1px solid var(--border); }
+  .add-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+  .form-field { margin-bottom: 16px; }
+  .form-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; display: block; font-weight: 700; }
+  .form-input {
+    width: 100%; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text); font-family: 'Syne', sans-serif;
+    font-size: 14px; padding: 14px 16px;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus { outline: none; border-color: var(--violet); }
+  .type-pills { display: flex; gap: 8px; }
+  .type-pill {
+    flex: 1; padding: 10px; border-radius: 10px; border: 2px solid var(--border);
+    background: transparent; color: var(--muted); font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .type-pill.selected.sport { border-color: var(--orange); color: var(--orange); background: rgba(255,107,0,0.1); }
+  .type-pill.selected.study { border-color: var(--violet); color: var(--violet2); background: rgba(124,58,237,0.1); }
+  .type-pill.selected.habit { border-color: var(--success); color: var(--success); background: rgba(34,197,94,0.1); }
+  .btn-add {
+    width: 100%; padding: 16px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, var(--violet), var(--orange));
+    color: white; font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 8px;
+  }
+
+  /* ===== FAB ===== */
+  .fab {
+    position: fixed; bottom: 90px; right: 20px; z-index: 50;
+    width: 56px; height: 56px; border-radius: 50%; border: none;
+    background: linear-gradient(135deg, var(--orange), var(--violet));
+    color: white; font-size: 26px; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(255,107,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .fab:active { transform: scale(0.93) rotate(15deg); }
+
+  /* ===== PROFILE / SETTINGS ===== */
+  .profile-header {
+    padding: 24px 16px;
+    display: flex; flex-direction: column; align-items: center;
+    background: linear-gradient(180deg, rgba(124,58,237,0.1) 0%, transparent 100%);
+  }
+  .profile-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet), var(--orange));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 800; border: 3px solid rgba(255,255,255,0.1);
+    margin-bottom: 12px;
+  }
+  .profile-name { font-size: 20px; font-weight: 800; }
+  .profile-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .level-bar-wrap { width: 100%; margin-top: 16px; }
+  .level-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .level-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .level-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--violet), var(--orange)); transition: width 1s ease; }
+
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px; margin: 0 16px 8px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    cursor: pointer;
+  }
+  .setting-left { display: flex; align-items: center; gap: 12px; }
+  .setting-icon { font-size: 20px; }
+  .setting-name { font-size: 14px; font-weight: 600; }
+  .toggle { width: 44px; height: 24px; border-radius: 12px; background: var(--border); position: relative; transition: background 0.3s; cursor: pointer; flex-shrink: 0; }
+  .toggle.on { background: var(--orange); }
+  .toggle::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: white; top: 3px; left: 3px; transition: left 0.3s; }
+  .toggle.on::after { left: 23px; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-100px);
+    background: var(--card2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 20px;
+    font-size: 14px; font-weight: 600; z-index: 300;
+    display: flex; align-items: center; gap: 8px;
+    transition: transform 0.3s ease; max-width: 300px; text-align: center;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--success); }
+  .toast.orange { border-color: var(--orange); }
+
+  /* ===== CHALLENGE (bonus feature) ===== */
+  .challenge-card {
+    background: linear-gradient(135deg, #1a1a0a, #0a0a1a);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 20px; padding: 20px; margin: 0 16px 16px;
+    position: relative; overflow: hidden;
+  }
+  .challenge-card::before {
+    content: ''; position: absolute; top: -30%; right: -10%;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(245,158,11,0.2) 0%, transparent 70%);
+  }
+  .challenge-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 700; margin-bottom: 8px; }
+  .challenge-text { font-size: 18px; font-weight: 800; line-height: 1.3; }
+  .challenge-reward { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .challenge-accept {
+    margin-top: 14px; padding: 10px 20px; border-radius: 10px; border: none;
+    background: var(--gold); color: var(--bg); font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 800; cursor: pointer; width: 100%;
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 0; }
+
+  /* ===== LOGO SPLASH ===== */
+  #splash {
+    position: fixed; inset: 0; z-index: 500;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.5s ease;
+  }
+  .splash-logo { font-size: 48px; font-weight: 800; letter-spacing: -2px; }
+  .splash-logo span { color: var(--orange); }
+  .splash-tagline { font-size: 14px; color: var(--muted); margin-top: 8px; letter-spacing: 2px; text-transform: uppercase; }
+  .splash-bar { width: 120px; height: 3px; background: var(--border); border-radius: 2px; margin-top: 40px; overflow: hidden; }
+  .splash-fill { height: 100%; background: linear-gradient(90deg, var(--violet), var(--orange)); border-radius: 2px; animation: load 1.5s ease forwards; }
+  @keyframes load { from { width: 0; } to { width: 100%; } }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- SPLASH -->
+  <div id="splash">
+    <div class="splash-logo">Focus<span>&</span>Disc.</div>
+    <div class="splash-tagline">Discipline wins</div>
+    <div class="splash-bar"><div class="splash-fill"></div></div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">✅ Objectif complété !</div>
+
+  <!-- ===== PAGE: HOME ===== -->
+  <div class="page active" id="page-home">
+    <div class="topbar">
+      <div>
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Jeudi 26 Mars</div>
+        <h1>Bonjour, <span id="username-display">Alex</span> 🔥</h1>
+      </div>
+      <button class="premium-badge" onclick="openPremium()">PRO</button>
+    </div>
+
+    <!-- STREAK -->
+    <div class="streak-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="streak-number" id="streak-count">7</div>
+          <div class="streak-label">🔥 Jours de streak</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:22px;font-weight:800;color:var(--violet2)" id="xp-display">1 240</div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">XP Total</div>
+        </div>
+      </div>
+      <div class="streak-row" id="streak-row"></div>
+    </div>
+
+    <!-- CHALLENGE DU JOUR (FEATURE UNIQUE) -->
+    <div class="challenge-card">
+      <div class="challenge-title">⚡ Défi du jour</div>
+      <div class="challenge-text" id="challenge-text">Complète 3 objectifs aujourd'hui sans pause !</div>
+      <div class="challenge-reward" id="challenge-reward">🏆 Récompense : +150 XP + Badge "Indestructible"</div>
+      <button class="challenge-accept" onclick="acceptChallenge()">Accepter le défi</button>
+    </div>
+
+    <!-- SECTION OBJECTIFS -->
+    <div class="section-title">📋 Objectifs du jour</div>
+    <div id="obj-list"></div>
+
+    <!-- STATS MINI -->
+    <div class="section-title">📊 Aujourd'hui</div>
+    <div class="stats-grid">
+      <div class="stat-mini"><div class="stat-mini-val orange" id="time-today">2h30</div><div class="stat-mini-label">Temps focus</div></div>
+      <div class="stat-mini"><div class="stat-mini-val violet" id="tasks-done">3/5</div><div class="stat-mini-label">Tâches</div></div>
+      <div class="stat-mini"><div class="stat-mini-val gold">7</div><div class="stat-mini-label">Streak jours</div></div>
+      <div class="stat-mini"><div class="stat-mini-val green" id="completion-pct">60%</div><div class="stat-mini-label">Complétion</div></div>
+    </div>
+  </div>
+
+  <!-- ===== PAGE: PLANNING ===== -->
+  <div class="page" id="page-plan">
+    <div class="topbar">
+      <h1>Plan<span>ning</span></h1>
+      <button onclick="openAdd()" style="background:var(--card);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">+ Ajouter</button>
+    </div>
+
+    <div class="week-scroll" id="week-scroll"></div>
+    <div class="section-title" id="plan-day-title">Tâches du jour</div>
+    <div id="task-list"></div>
+  </div>
+
+  <!-- ===== PAGE: POMODORO ===== -->
+  <div class="page" id="page-pomo">
+    <div class="topbar"><h1>Pomo<span>doro</span></h1></div>
+    <div class="pomo-wrap">
+      <div class="pomo-modes">
+        <button class="pomo-mode-btn active" onclick="setPomoMode('work',25,this)">Focus 25</button>
+        <button class="pomo-mode-btn" onclick="setPomoMode('work',50,this)">Deep 50</button>
+        <button class="pomo-mode-btn" onclick="setPomoMode('rest',5,this)">Pause 5</button>
+      </div>
+
+      <select class="pomo-task-select" id="pomo-task-sel">
+        <option>🎯 Sélectionne un objectif…</option>
+      </select>
+
+      <div class="pomo-ring">
+        <svg viewBox="0 0 240 240">
+          <circle class="bg" cx="120" cy="120" r="110"/>
+          <circle class="prog work" id="pomo-circle" cx="120" cy="120" r="110"/>
+        </svg>
+        <div class="pomo-center">
+          <div class="pomo-time" id="pomo-time">25:00</div>
+          <div class="pomo-type" id="pomo-label">FOCUS</div>
+        </div>
+      </div>
+
+      <div class="pomo-controls">
+        <button class="btn-pomo secondary" onclick="resetPomo()">↺</button>
+        <button class="btn-pomo primary" id="pomo-btn" onclick="togglePomo()">▶</button>
+        <button class="btn-pomo secondary" onclick="skipPomo()">⏭</button>
+      </div>
+
+      <div class="pomo-sessions" id="pomo-sessions"></div>
+
+      <div class="card card-glow" style="width:100%;margin-top:20px;">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;">Session en cours</div>
+        <div style="display:flex;justify-content:space-between;">
+          <div><div style="font-size:24px;font-weight:800;color:var(--orange)" id="pomo-total">0</div><div style="font-size:11px;color:var(--muted)">Sessions</div></div>
+          <div><div style="font-size:24px;font-weight:800;color:var(--violet2)" id="pomo-min">0</div><div style="font-size:11px;color:var(--muted)">Min Focus</div></div>
+          <div><div style="font-size:24px;font-weight:800;color:var(--success)" id="pomo-xp">0</div><div style="font-size:11px;color:var(--muted)">XP Gagné</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PAGE: STATS ===== -->
+  <div class="page" id="page-stats">
+    <div class="topbar"><h1>Stat<span>istiques</span></h1></div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">⏱ Temps focus (7 jours)</div>
+      <div class="bar-chart" id="weekly-chart"></div>
+    </div>
+
+    <div class="progress-ring-wrap" id="prog-rings"></div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">📈 Score de régularité</div>
+      <div style="text-align:center;padding:16px 0;">
+        <div style="font-size:56px;font-weight:800;background:linear-gradient(135deg,var(--orange),var(--violet2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">87%</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">Discipline Score — Top 12% des utilisateurs</div>
+        <div style="margin-top:16px;height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:87%;background:linear-gradient(90deg,var(--violet),var(--orange));border-radius:4px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">🏅 Badges & Récompenses</div>
+    <div class="badges-grid" id="badges-grid"></div>
+  </div>
+
+  <!-- ===== PAGE: PROFILE ===== -->
+  <div class="page" id="page-profile">
+    <div class="topbar"><h1>Pro<span>fil</span></h1></div>
+
+    <div class="profile-header">
+      <div class="profile-avatar">A</div>
+      <div class="profile-name" id="profile-name">Alex Dupont</div>
+      <div class="profile-sub">Niveau 8 • Guerrier Discipliné</div>
+      <div class="level-bar-wrap">
+        <div class="level-row"><span>Niveau 8</span><span>1240 / 2000 XP</span></div>
+        <div class="level-bar"><div class="level-fill" style="width:62%"></div></div>
+      </div>
+    </div>
+
+    <div class="section-title">⚙️ Paramètres</div>
+
+    <div class="setting-row" onclick="toggleSetting(this)">
+      <div class="setting-left"><span class="setting-icon">🔔</span><span class="setting-name">Rappels quotidiens</span></div>
+      <div class="toggle on"></div>
+    </div>
+    <div class="setting-row" onclick="toggleSetting(this)">
+      <div class="setting-left"><span class="setting-icon">🔊</span><span class="setting-name">Sons & vibrations</span></div>
+      <div class="toggle on"></div>
+    </div>
+    <div class="setting-row" onclick="toggleSetting(this)">
+      <div class="setting-left"><span class="setting-icon">📊</span><span class="setting-name">Rapport hebdo par email</span></div>
+      <div class="toggle"></div>
+    </div>
+    <div class="setting-row" onclick="openPremium()">
+      <div class="setting-left"><span class="setting-icon">👑</span><span class="setting-name">Passer en Premium</span></div>
+      <span style="color:var(--gold);font-size:13px;font-weight:700;">Voir →</span>
+    </div>
+    <div class="setting-row" onclick="showToast('🚪 Déconnexion simulée','orange')">
+      <div class="setting-left"><span class="setting-icon">🚪</span><span class="setting-name">Se déconnecter</span></div>
+      <span style="color:var(--muted);font-size:18px;">→</span>
+    </div>
+
+    <div style="text-align:center;padding:24px;color:var(--muted);font-size:12px;">Focus & Discipline v1.0 — © 2025</div>
+  </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="navigate('home',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Accueil
+    </button>
+    <button class="nav-item" onclick="navigate('plan',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Planning
+    </button>
+    <button class="nav-item" onclick="navigate('pomo',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+      Timer
+    </button>
+    <button class="nav-item" onclick="navigate('stats',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Stats
+    </button>
+    <button class="nav-item" onclick="navigate('profile',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profil
+    </button>
+  </nav>
+
+  <!-- FAB -->
+  <button class="fab" onclick="openAdd()">+</button>
+
+  <!-- PREMIUM MODAL -->
+  <div class="modal-overlay" id="premium-modal" onclick="if(event.target===this)closePremium()">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div style="text-align:center;font-size:36px;margin-bottom:8px;">👑</div>
+      <div class="modal-title">Focus <span style="color:var(--gold)">Premium</span></div>
+      <div class="modal-sub">Débloque tout le potentiel de ton app</div>
+      <div class="premium-features">
+        <div class="prem-feat"><div class="prem-feat-icon">📊</div><div class="prem-feat-text"><div class="prem-feat-title">Analytics Avancées</div><div class="prem-feat-desc">Graphiques détaillés, tendances, prédictions</div></div></div>
+        <div class="prem-feat"><div class="prem-feat-icon">🤖</div><div class="prem-feat-text"><div class="prem-feat-title">Coach IA Personnel</div><div class="prem-feat-desc">Plans personnalisés générés par IA chaque semaine</div></div></div>
+        <div class="prem-feat"><div class="prem-feat-icon">⚡</div><div class="prem-feat-text"><div class="prem-feat-title">Objectifs illimités</div><div class="prem-feat-desc">Sans limite + rappels intelligents avancés</div></div></div>
+        <div class="prem-feat"><div class="prem-feat-icon">🔥</div><div class="prem-feat-text"><div class="prem-feat-title">Streak Protection</div><div class="prem-feat-desc">1 joker par mois pour protéger ton streak</div></div></div>
+        <div class="prem-feat"><div class="prem-feat-icon">🏆</div><div class="prem-feat-text"><div class="prem-feat-title">Classement Global</div><div class="prem-feat-desc">Affronte d'autres utilisateurs en temps réel</div></div></div>
+      </div>
+      <div class="prem-price-row">
+        <div class="price-card" id="price-month" onclick="selectPrice('month')">
+          <div class="price-period">Mensuel</div>
+          <div class="price-amount">4,99€</div>
+          <div style="font-size:11px;color:var(--muted)">/ mois</div>
+        </div>
+        <div class="price-card selected" id="price-year" onclick="selectPrice('year')">
+          <div class="price-period">Annuel</div>
+          <div class="price-amount">34,99€</div>
+          <div class="price-save">-42%</div>
+        </div>
+      </div>
+      <button class="btn-premium" onclick="purchasePremium()">🚀 Démarrer Premium</button>
+      <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:12px;">Annulable à tout moment • Paiement sécurisé</div>
+    </div>
+  </div>
+
+  <!-- ADD MODAL -->
+  <div class="add-modal" id="add-modal" onclick="if(event.target===this)closeAdd()">
+    <div class="add-sheet">
+      <div class="add-title">Nouvel objectif ✨</div>
+      <div class="form-field">
+        <label class="form-label">Nom</label>
+        <input class="form-input" id="obj-name" placeholder="Ex: Courir 5km, Lire 30 min…">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Catégorie</label>
+        <div class="type-pills">
+          <button class="type-pill selected sport" data-type="sport" onclick="selectType(this)">🏋️ Sport</button>
+          <button class="type-pill study" data-type="study" onclick="selectType(this)">📚 Études</button>
+          <button class="type-pill habit" data-type="habit" onclick="selectType(this)">✨ Habitude</button>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Fréquence</label>
+        <select class="form-input" id="obj-freq">
+          <option value="daily">Chaque jour</option>
+          <option value="weekdays">Lundi – Vendredi</option>
+          <option value="3x">3x / semaine</option>
+          <option value="weekly">1x / semaine</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Durée cible</label>
+        <select class="form-input" id="obj-dur">
+          <option>15 min</option>
+          <option>30 min</option>
+          <option selected>45 min</option>
+          <option>1h</option>
+          <option>1h30</option>
+          <option>2h</option>
+        </select>
+      </div>
+      <button class="btn-add" onclick="addObjective()">Créer l'objectif 🎯</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== STATE =====
+let state = {
+  streak: 7,
+  xp: 1240,
+  objectives: [
+    { id: 1, title: "Musculation", type: "sport", icon: "🏋️", freq: "daily", dur: "1h", progress: 70, done: false },
+    { id: 2, title: "Révisions Maths", type: "study", icon: "📚", freq: "weekdays", dur: "1h30", progress: 45, done: false },
+    { id: 3, title: "Lecture 30min", type: "habit", icon: "📖", freq: "daily", dur: "30min", progress: 100, done: true },
+    { id: 4, title: "Méditation", type: "habit", icon: "🧘", freq: "daily", dur: "15min", progress: 0, done: false },
+    { id: 5, title: "Running", type: "sport", icon: "🏃", freq: "3x", dur: "45min", progress: 0, done: false },
+  ],
+  tasks: [
+    { id: 1, time: "07:00", name: "Running 5km", cat: "sport", done: true },
+    { id: 2, time: "09:00", name: "Révisions algo", cat: "study", done: true },
+    { id: 3, time: "12:30", name: "Méditation", cat: "habit", done: false },
+    { id: 4, time: "15:00", name: "Musculation", cat: "sport", done: false },
+    { id: 5, time: "20:00", name: "Lecture", cat: "habit", done: false },
+  ],
+  pomo: { running: false, work: true, duration: 25, remaining: 25*60, sessions: 0, totalMin: 0, sessionXP: 0, interval: null },
+  badges: [
+    { emoji: "🔥", name: "7 jours", unlocked: true },
+    { emoji: "⚡", name: "1er focus", unlocked: true },
+    { emoji: "🏋️", name: "Sportif", unlocked: true },
+    { emoji: "📚", name: "Étudiant", unlocked: true },
+    { emoji: "🌙", name: "Nocturne", unlocked: false },
+    { emoji: "🚀", name: "30 jours", unlocked: false },
+    { emoji: "💎", name: "Légendaire", unlocked: false },
+    { emoji: "🏆", name: "Champion", unlocked: false },
+  ],
+  selectedType: 'sport',
+  selectedDay: new Date().getDate(),
+  priceSelected: 'year',
+};
+
+const challenges = [
+  { text: "Complète 3 objectifs aujourd'hui sans pause !", reward: "🏆 +150 XP + Badge «Indestructible»" },
+  { text: "Fais une session focus de 50 minutes d'affilée !", reward: "⚡ +200 XP + Badge «Deep Work»" },
+  { text: "Commence ton premier objectif avant 8h !", reward: "🌅 +100 XP + Badge «Lève-tôt»" },
+  { text: "Complete tous tes objectifs sport cette semaine !", reward: "💪 +300 XP + Badge «Athlète»" },
+];
+
+// ===== INIT =====
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    splash.style.opacity = '0';
+    setTimeout(() => splash.style.display = 'none', 500);
+  }, 1800);
+  renderAll();
+});
+
+function renderAll() {
+  renderStreak();
+  renderObjectives();
+  renderWeek();
+  renderTasks();
+  renderPomoSessions();
+  renderWeeklyChart();
+  renderProgRings();
+  renderBadges();
+  renderPomoTaskList();
+  renderChallenge();
+}
+
+// ===== STREAK =====
+function renderStreak() {
+  const row = document.getElementById('streak-row');
+  const days = ['L','M','M','J','V','S','D'];
+  row.innerHTML = days.map((d,i) => {
+    const cls = i < state.streak % 7 ? 'done' : (i === state.streak % 7 ? 'today' : '');
+    return `<div class="streak-dot ${cls}" title="${d}"></div>`;
+  }).join('');
+  document.getElementById('streak-count').textContent = state.streak;
+  document.getElementById('xp-display').textContent = state.xp.toLocaleString('fr');
+}
+
+// ===== OBJECTIVES =====
+function renderObjectives() {
+  const list = document.getElementById('obj-list');
+  list.innerHTML = state.objectives.map(o => `
+    <div class="obj-card ${o.type}" onclick="toggleObj(${o.id})">
+      <div class="obj-icon ${o.type}">${o.icon}</div>
+      <div class="obj-info">
+        <div class="obj-title${o.done?' task-done':''}">${o.title}</div>
+        <div class="obj-sub">${o.dur} • ${freqLabel(o.freq)}</div>
+        <div class="obj-progress"><div class="obj-bar" style="width:${o.progress}%"></div></div>
+      </div>
+      <div class="obj-check${o.done?' done':''}">${o.done?'✓':''}</div>
+    </div>`).join('');
+  updateStats();
+}
+
+function freqLabel(f) {
+  const m = {daily:'Quotidien',weekdays:'Lun–Ven','3x':'3x/sem',weekly:'1x/sem'};
+  return m[f] || f;
+}
+
+function toggleObj(id) {
+  const obj = state.objectives.find(o => o.id === id);
+  if (!obj) return;
+  obj.done = !obj.done;
+  obj.progress = obj.done ? 100 : 0;
+  if (obj.done) {
+    state.xp += 50;
+    showToast(`+50 XP — ${obj.title} ✅`, 'success');
+    checkStreakIncrease();
+  }
+  renderObjectives();
+  renderStreak();
+}
+
+function checkStreakIncrease() {
+  const done = state.objectives.filter(o=>o.done).length;
+  if (done === state.objectives.length) {
+    state.streak++;
+    state.xp += 100;
+    showToast('🔥 Streak augmenté ! +100 XP bonus');
+    renderStreak();
+  }
+}
+
+function updateStats() {
+  const done = state.objectives.filter(o=>o.done).length;
+  const total = state.objectives.length;
+  document.getElementById('tasks-done').textContent = `${done}/${total}`;
+  document.getElementById('completion-pct').textContent = `${Math.round(done/total*100)}%`;
+}
+
+// ===== WEEK PLANNING =====
+function renderWeek() {
+  const scroll = document.getElementById('week-scroll');
+  const today = new Date();
+  const days = ['DIM','LUN','MAR','MER','JEU','VEN','SAM'];
+  let html = '';
+  for (let i = -3; i <= 3; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const isToday = i === 0;
+    const hasTasks = Math.random() > 0.3;
+    html += `<div class="day-pill ${isToday?'today':''} ${hasTasks?'has-tasks':''}" onclick="selectDay(${d.getDate()}, this, '${days[d.getDay()]} ${d.getDate()}')">
+      <div class="day-abbr">${days[d.getDay()]}</div>
+      <div class="day-num">${d.getDate()}</div>
+      ${hasTasks?'<div class="day-dot"></div>':''}
+    </div>`;
+  }
+  scroll.innerHTML = html;
+}
+
+function selectDay(date, el, label) {
+  state.selectedDay = date;
+  document.querySelectorAll('.day-pill').forEach(d => d.classList.remove('today'));
+  el.classList.add('today');
+  document.getElementById('plan-day-title').textContent = `Tâches — ${label}`;
+}
+
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  list.innerHTML = state.tasks.map(t => `
+    <div class="task-item" onclick="toggleTask(${t.id})">
+      <div class="task-time">${t.time}</div>
+      <div class="task-name${t.done?' task-done':''}">${t.name}</div>
+      <div class="task-cat ${t.cat}">${t.cat}</div>
+    </div>`).join('');
+}
+
+function toggleTask(id) {
+  const t = state.tasks.find(x => x.id === id);
+  if (!t) return;
+  t.done = !t.done;
+  if (t.done) showToast(`✅ ${t.name} terminé !`, 'success');
+  renderTasks();
+}
+
+// ===== POMODORO =====
+let pomoInterval = null;
+const CIRCUM = 2 * Math.PI * 110;
+
+function renderPomoSessions() {
+  const wrap = document.getElementById('pomo-sessions');
+  wrap.innerHTML = Array(4).fill(0).map((_,i) =>
+    `<div class="session-dot ${i < state.pomo.sessions ? 'done' : ''}"></div>`).join('');
+}
+
+function renderPomoTaskList() {
+  const sel = document.getElementById('pomo-task-sel');
+  state.objectives.forEach(o => {
+    const opt = document.createElement('option');
+    opt.textContent = `${o.icon} ${o.title}`;
+    sel.appendChild(opt);
+  });
+}
+
+function setPomoMode(type, mins, btn) {
+  if (state.pomo.running) return;
+  document.querySelectorAll('.pomo-mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.pomo.work = (type === 'work');
+  state.pomo.duration = mins;
+  state.pomo.remaining = mins * 60;
+  updatePomoDisplay();
+}
+
+function updatePomoDisplay() {
+  const m = Math.floor(state.pomo.remaining / 60);
+  const s = state.pomo.remaining % 60;
+  document.getElementById('pomo-time').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  document.getElementById('pomo-label').textContent = state.pomo.work ? 'FOCUS' : 'PAUSE';
+  const total = state.pomo.duration * 60;
+  const frac = state.pomo.remaining / total;
+  const offset = CIRCUM * frac;
+  const circle = document.getElementById('pomo-circle');
+  circle.style.strokeDashoffset = CIRCUM - offset;
+  circle.className = `prog ${state.pomo.work ? 'work' : 'rest'}`;
+}
+
+function togglePomo() {
+  if (state.pomo.running) {
+    clearInterval(pomoInterval);
+    state.pomo.running = false;
+    document.getElementById('pomo-btn').textContent = '▶';
+  } else {
+    state.pomo.running = true;
+    document.getElementById('pomo-btn').textContent = '⏸';
+    pomoInterval = setInterval(() => {
+      state.pomo.remaining--;
+      if (state.pomo.remaining <= 0) {
+        clearInterval(pomoInterval);
+        state.pomo.running = false;
+        document.getElementById('pomo-btn').textContent = '▶';
+        if (state.pomo.work) {
+          state.pomo.sessions = (state.pomo.sessions + 1) % 5;
+          state.pomo.totalMin += state.pomo.duration;
+          state.pomo.sessionXP += 30;
+          state.xp += 30;
+          showToast(`🍅 Session terminée ! +30 XP`, 'success');
+        }
+        document.getElementById('pomo-total').textContent = state.pomo.sessions || (state.pomo.sessions === 0 ? '4' : state.pomo.sessions);
+        document.getElementById('pomo-min').textContent = state.pomo.totalMin;
+        document.getElementById('pomo-xp').textContent = state.pomo.sessionXP;
+        renderPomoSessions();
+        renderStreak();
+      }
+      updatePomoDisplay();
+    }, 1000);
+  }
+}
+
+function resetPomo() {
+  clearInterval(pomoInterval);
+  state.pomo.running = false;
+  state.pomo.remaining = state.pomo.duration * 60;
+  document.getElementById('pomo-btn').textContent = '▶';
+  updatePomoDisplay();
+}
+
+function skipPomo() {
+  clearInterval(pomoInterval);
+  state.pomo.running = false;
+  state.pomo.remaining = 0;
+  document.getElementById('pomo-btn').textContent = '▶';
+  updatePomoDisplay();
+}
+
+// ===== STATS =====
+function renderWeeklyChart() {
+  const data = [45, 90, 30, 120, 75, 110, 150];
+  const days = ['L','M','M','J','V','S','D'];
+  const max = Math.max(...data);
+  const chart = document.getElementById('weekly-chart');
+  chart.innerHTML = data.map((v, i) => `
+    <div class="bar-col">
+      <div class="bar ${i === 6 ? 'orange' : i % 2 === 0 ? 'violet' : 'mixed'}" style="height:${Math.round(v/max*90)}px"></div>
+      <div class="bar-label">${days[i]}</div>
+    </div>`).join('');
+}
+
+function renderProgRings() {
+  const wrap = document.getElementById('prog-rings');
+  const rings = [
+    { label: 'Sport', val: 80, color: 'var(--orange)', pct: '80%' },
+    { label: 'Études', val: 60, color: 'var(--violet2)', pct: '60%' },
+    { label: 'Habitudes', val: 90, color: 'var(--success)', pct: '90%' },
+  ];
+  const R = 35, C = 2 * Math.PI * R;
+  wrap.innerHTML = rings.map(r => `
+    <div class="prog-ring-card">
+      <svg viewBox="0 0 80 80">
+        <circle class="bg2" cx="40" cy="40" r="${R}" />
+        <circle class="fg" cx="40" cy="40" r="${R}"
+          transform="rotate(-90 40 40)"
+          stroke="${r.color}"
+          style="stroke-dashoffset:${C - C * r.val/100}"
+        />
+        <text x="40" y="45" text-anchor="middle" fill="white" font-size="14" font-weight="800" font-family="Syne">${r.pct}</text>
+      </svg>
+      <div class="prog-ring-label">${r.label}</div>
+    </div>`).join('');
+}
+
+function renderBadges() {
+  const grid = document.getElementById('badges-grid');
+  grid.innerHTML = state.badges.map(b => `
+    <div class="badge-item ${b.unlocked ? 'unlocked' : 'locked'}" title="${b.name}">
+      <div class="badge-emoji">${b.emoji}</div>
+      <div class="badge-name">${b.name}</div>
+    </div>`).join('');
+}
+
+// ===== CHALLENGE =====
+function renderChallenge() {
+  const c = challenges[Math.floor(Math.random() * challenges.length)];
+  document.getElementById('challenge-text').textContent = c.text;
+  document.getElementById('challenge-reward').textContent = c.reward;
+}
+
+function acceptChallenge() {
+  state.xp += 20;
+  showToast('⚡ Défi accepté ! Bonne chance !', 'orange');
+  renderStreak();
+}
+
+// ===== NAVIGATION =====
+function navigate(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  btn.classList.add('active');
+  if (page === 'pomo') updatePomoDisplay();
+  if (page === 'stats') { renderWeeklyChart(); renderProgRings(); }
+}
+
+// ===== MODALS =====
+function openPremium() { document.getElementById('premium-modal').classList.add('open'); }
+function closePremium() { document.getElementById('premium-modal').classList.remove('open'); }
+function openAdd() { document.getElementById('add-modal').classList.add('open'); }
+function closeAdd() { document.getElementById('add-modal').classList.remove('open'); }
+
+function selectPrice(type) {
+  state.priceSelected = type;
+  document.getElementById('price-month').classList.toggle('selected', type === 'month');
+  document.getElementById('price-year').classList.toggle('selected', type === 'year');
+}
+
+function purchasePremium() {
+  closePremium();
+  const price = state.priceSelected === 'year' ? '34,99€/an' : '4,99€/mois';
+  showToast(`🎉 Abonnement Premium activé (${price}) !`, 'success');
+}
+
+// ===== ADD OBJECTIVE =====
+function selectType(btn) {
+  document.querySelectorAll('.type-pill').forEach(b => {
+    b.className = `type-pill ${b.dataset.type}`;
+  });
+  btn.classList.add('selected');
+  state.selectedType = btn.dataset.type;
+}
+
+function addObjective() {
+  const name = document.getElementById('obj-name').value.trim();
+  if (!name) { showToast('⚠️ Entre un nom d\'objectif', 'orange'); return; }
+  const freq = document.getElementById('obj-freq').value;
+  const dur = document.getElementById('obj-dur').value;
+  const icons = { sport: '🏋️', study: '📚', habit: '✨' };
+  state.objectives.push({
+    id: Date.now(), title: name, type: state.selectedType,
+    icon: icons[state.selectedType], freq, dur, progress: 0, done: false
+  });
+  document.getElementById('obj-name').value = '';
+  closeAdd();
+  renderObjectives();
+  renderPomoTaskList();
+  showToast(`🎯 "${name}" ajouté !`, 'success');
+}
+
+// ===== SETTINGS =====
+function toggleSetting(row) {
+  const toggle = row.querySelector('.toggle');
+  if (!toggle) return;
+  toggle.classList.toggle('on');
+  showToast(toggle.classList.contains('on') ? '✅ Activé' : '🔕 Désactivé');
+}
+
+// ===== TOAST =====
+function showToast(msg, type = '') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = `toast show ${type}`;
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
